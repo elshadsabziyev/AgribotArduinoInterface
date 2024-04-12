@@ -10,6 +10,36 @@ import inquirer
 
 
 class AgribotAdmin:
+    """
+    The AgribotAdmin class represents an administrator for the Agribot system.
+
+    Args:
+        email (str): The email address of the user.
+        random_mode (bool, optional): Whether to generate random data instead of reading from Arduino. Defaults to False.
+        forced_port (str, optional): The serial port to use for communication with Arduino. Defaults to False.
+        forced_baud_rate (int, optional): The baud rate to use for communication with Arduino. Defaults to False.
+        force_secrets_file (bool, optional): Whether to force loading secrets from a specific file. Defaults to False.
+
+    Attributes:
+        random_mode (bool): Whether the system is in random mode.
+        serial_port (str): The serial port used for communication with Arduino.
+        baud_rate (int): The baud rate used for communication with Arduino.
+        ser (serial.Serial): The serial connection object.
+        user_info (dict): Information about the authenticated user.
+        db (RealtimeDB): The Realtime Database object for interacting with Firebase.
+
+    Methods:
+        load_secrets: Load secrets from a TOML file.
+        authenticate_user: Authenticate the user with the provided email and password.
+        setup_serial_connection: Set up the serial connection with Arduino.
+        generate_random_data: Generate random sensor data.
+        find_arduino_port: Find the port where Arduino is connected.
+        initialize_port_and_baud_rate: Initialize the port and baud rate for communication with Arduino.
+        read_from_arduino: Read data from Arduino.
+        run: Run the Agribot system.
+
+    """
+
     def __init__(
         self,
         email,
@@ -28,12 +58,26 @@ class AgribotAdmin:
         print("Initialization complete.")
 
     def load_secrets(self, force_secrets_file):
+        """
+        Load secrets from a TOML file.
+
+        Args:
+            force_secrets_file (bool): Whether to force loading secrets from a specific file.
+
+        """
         if force_secrets_file:
             load_secrets_from_toml(force_secrets_file)
         else:
             load_secrets_from_toml("secrets.toml")
 
     def authenticate_user(self, email):
+        """
+        Authenticate the user with the provided email and password.
+
+        Args:
+            email (str): The email address of the user.
+
+        """
         password = inquirer.prompt(
             [
                 inquirer.Password(
@@ -52,12 +96,23 @@ class AgribotAdmin:
         self.db = RealtimeDB(self.user_info)
 
     def setup_serial_connection(self):
+        """
+        Set up the serial connection with Arduino.
+
+        """
         self.ser = serial.Serial(self.serial_port, self.baud_rate, timeout=1)
         print(f"Connected to {self.serial_port} at {self.baud_rate} baud rate.")
         time.sleep(2)
 
     @staticmethod
     def generate_random_data():
+        """
+        Generate random sensor data.
+
+        Returns:
+            tuple: A tuple containing the generated sensor data and valve status.
+
+        """
         return {
             "humidity": round(random.uniform(0, 100), 2),
             "temperature": round(random.uniform(0, 40), 2),
@@ -67,6 +122,16 @@ class AgribotAdmin:
         }, {"valve_status": "on" if random.randint(0, 1) == 1 else "off"}
 
     def find_arduino_port(self):
+        """
+        Find the port where Arduino is connected.
+
+        Returns:
+            str: The port where Arduino is connected.
+
+        Raises:
+            Exception: If Arduino is not found.
+
+        """
         if os.name == "nt":  # Windows
             ports = [f"COM{i}" for i in range(256)]
         else:  # Unix-like - ignore code is unreachable warning if you're on Windows
@@ -87,6 +152,17 @@ class AgribotAdmin:
         raise Exception("Arduino not found.")
 
     def initialize_port_and_baud_rate(self, forced_port, forced_baud_rate):
+        """
+        Initialize the port and baud rate for communication with Arduino.
+
+        Args:
+            forced_port (str): The serial port to use for communication with Arduino.
+            forced_baud_rate (int): The baud rate to use for communication with Arduino.
+
+        Returns:
+            tuple: A tuple containing the initialized port and baud rate.
+
+        """
         return_dict = {}
         if forced_port:
             return_dict["port"] = forced_port
@@ -101,6 +177,16 @@ class AgribotAdmin:
         return return_dict["port"], return_dict["baud_rate"]
 
     def read_from_arduino(self, ser):
+        """
+        Read data from Arduino.
+
+        Args:
+            ser (serial.Serial): The serial connection object.
+
+        Returns:
+            tuple: A tuple containing the read sensor data and valve status.
+
+        """
         data = ser.readline().decode("utf-8", "ignore").strip()
         if data.startswith("<") and data.endswith(">"):
             data = data[1:-1]  # Remove the angle brackets
@@ -115,13 +201,11 @@ class AgribotAdmin:
                 }, {"valve_status": "on" if parts[4] == "1" else "off"}
         return None, None
 
-    @staticmethod
-    def write_to_arduino(ser, valve_status):
-        if isinstance(valve_status, dict) and "valve_status" in valve_status:
-            command = "ON" if valve_status["valve_status"] == 1 else "OFF"
-            ser.write(command.encode())
-
     def run(self):
+        """
+        Run the Agribot system.
+
+        """
         while True:
             if self.random_mode:
                 data, valve_status = self.generate_random_data()
