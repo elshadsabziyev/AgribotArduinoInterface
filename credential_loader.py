@@ -19,10 +19,48 @@ class Credentials:
     """
 
     def __init__(self) -> None:
-        self.firebase_cert = self.make_firebase_cert()
-        self.firebase_config = self.get_firebase_config()
-        self.openai_credentials = self.get_openai_credentials()
-        self.db_url = os.environ["FIREBASE_CONFIG_DATABASEURL"]
+        try:
+            self.firebase_cert = self.make_firebase_cert()
+        except Exception as e:
+            print(
+                """
+            There was an error initializing admin credentials.
+            It's only for development purposes. You can ignore this error.
+            Continuing with the program...
+            """
+            )
+        try:
+            self.firebase_config = self.get_firebase_config()
+        except Exception as e:
+            print(
+                """
+            There was an error initializing Firebase configuration.
+            You must provide the Firebase configuration in the environment variables.
+            Exiting...
+            """
+            )
+            exit(1)
+        try:
+            self.openai_credentials = self.get_openai_credentials()
+        except Exception as e:
+            print(
+                """
+            There was an error initializing OpenAI credentials.
+            It's only for development purposes. You can ignore this error.
+            Continuing with the program...
+            """
+            )
+        try:
+            self.db_url = os.environ["FIREBASE_CONFIG_DATABASEURL"]
+        except Exception as e:
+            print(
+                """
+            There was an error initializing the Firebase database URL.
+            You must provide the Firebase configuration in the environment variables.
+            Exiting...
+            """
+            )
+            exit(1)
 
     def make_firebase_cert(self) -> credentials.Certificate:
         """
@@ -40,7 +78,9 @@ class Credentials:
             "client_id": os.environ["FIREBASE_AUTH_CLIENT_ID"],
             "auth_uri": os.environ["FIREBASE_AUTH_AUTH_URI"],
             "token_uri": os.environ["FIREBASE_AUTH_TOKEN_URI"],
-            "auth_provider_x509_cert_url": os.environ["FIREBASE_AUTH_AUTH_PROVIDER_X509_CERT_URL"],
+            "auth_provider_x509_cert_url": os.environ[
+                "FIREBASE_AUTH_AUTH_PROVIDER_X509_CERT_URL"
+            ],
             "client_x509_cert_url": os.environ["FIREBASE_AUTH_CLIENT_X509_CERT_URL"],
         }
         return credentials.Certificate(credentials_dict)
