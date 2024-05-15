@@ -10,6 +10,8 @@ Agribot365 Dashboard is a real-time sensor data visualization tool for farmers. 
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
+    - [1. Arduino Setup](#1-arduino-setup)
+    - [2. Firebase Configuration and App Setup](#2-firebase-configuration-and-app-setup)
   - [License](#license)
   - [Contributing](#contributing)
 
@@ -29,6 +31,13 @@ Agribot365 Dashboard is a real-time sensor data visualization tool for farmers. 
     ```
 
 ## Usage
+### 1. Arduino Setup
+1. Connect the sensors to the Arduino board.
+2. Upload the `sensors.ino` sketch to the Arduino board.
+3. Connect the Arduino board to your computer using a USB cable.
+4. Open the Arduino IDE and go to `Tools > Port` to select the port where the Arduino board is connected.
+
+### 2. Firebase Configuration and App Setup
 1. You need to create a Firebase project and download the service account key file. You can follow the instructions [here](https://firebase.google.com/) to create a Firebase project and download the service account key file.
 2. To convert JSON to TOML, go to [ConvertSimple](https://convertsimple.com/convert-json-to-toml/) and convert the JSON file to TOML. Copy the TOML content.
 3. Create secrets.toml file in the root directory of the project and add TOML content under the `[firebase_auth]` section. Example:
@@ -73,3 +82,4 @@ This project is licensed under the GNU General Public License v3.0. See the [LIC
 ## Contributing
 
 Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) to get started.
+`
