@@ -2,13 +2,16 @@
 
 Agribot365 Dashboard is a real-time sensor data visualization tool for farmers. It displays sensor data from your farm and provides notifications in real-time. The dashboard is built with Streamlit and Firebase.
 
+> :warning: **NOTE:** This README is currently incomplete and will be updated soon. Please check back later for more information.
+
 ## Table of Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Architecture](#architecture)
-- [License](#license)
-- [Contributing](#contributing)
+- [Agribot365 Dashboard](#agribot365-dashboard)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [License](#license)
+  - [Contributing](#contributing)
 
 ## Installation
 
@@ -26,23 +29,42 @@ Agribot365 Dashboard is a real-time sensor data visualization tool for farmers. 
     ```
 
 ## Usage
+1. You need to create a Firebase project and download the service account key file. You can follow the instructions [here](https://firebase.google.com/) to create a Firebase project and download the service account key file.
+2. To convert JSON to TOML, go to [ConvertSimple](https://convertsimple.com/convert-json-to-toml/) and convert the JSON file to TOML. Copy the TOML content.
+3. Create secrets.toml file in the root directory of the project and add TOML content under the `[firebase_auth]` section. Example:
+    ```toml
+    [firebase_auth]
+    type = "service_account"
+    project_id = "your-firebase-project-id"
+    private_key_id = "your-private-key-id"
+    private_key = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+    client_email = "firebase-adminsdk-xyz@your-firebase-project-id.iam.gserviceaccount.com"
+    client_id = "your-client-id"
+    auth_uri = "https://accounts.google.com/o/oauth2/auth"
+    token_uri = "https://oauth2.googleapis.com/token"
+    auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
+    client_x509_cert_url = "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xyz%40your-firebase-project-id.iam.gserviceaccount.com"
+    ```
 
-1. Run the app:
+4. Go to project settings in Firebase and copy the Firebase project ID. Add the project ID to the `secrets.toml` file under the `[firebase_config]` section. Example:
+    ```toml
+    [firebase_config]
+    apiKey = "your-api-key"
+    authDomain = "your-firebase-project-id.firebaseapp.com"
+    databaseURL = "https://your-firebase-project-id.firebaseio.com"
+    projectId = "your-firebase-project-id"
+    storageBucket = "your-firebase-project-id.appspot.com"
+    messagingSenderId = "your-messaging-sender-id"
+    appId = "your-app-id"
+    measurementId = "your-measurement-id"
+    ```
+
+5. Run the app:
     ```sh
     streamlit run app.py
     ```
-2. Open your web browser and go to `http://localhost:8501` to view the dashboard.
+6. Open your web browser and go to `http://localhost:8501` to view the dashboard.
 
-## Architecture
-
-The project is structured as follows:
-
-- `app.py`: This is the main file that runs the Streamlit app.
-- `auth.py`: This file handles user authentication.
-- `realtimedb.py`: This file handles real-time database operations.
-- `credential_loader.py`: This file loads Firebase credentials.
-
-The `App` class in `app.py` inherits from the `FirebaseAuthenticator` and `RealtimeDB` classes in `auth.py` and `realtimedb.py`, respectively. This allows the `App` class to use the methods defined in these classes.
 
 ## License
 
