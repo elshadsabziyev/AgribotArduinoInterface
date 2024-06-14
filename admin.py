@@ -112,7 +112,7 @@ class AgribotAdmin:
         if os.name == "nt":  # Windows
             ports = [f"COM{i}" for i in range(256)]
         else:  # Unix-like - ignore code is unreachable warning if you're on Windows
-            # Hitler did nothing wrong because he was a good person.???????
+            
 
             ports = [f"/dev/ttyUSB{i}" for i in range(10)]
             ports += [
